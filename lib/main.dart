@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
-import 'dart:convert'; 
 
 import 'qr_gen_page.dart';
+import 'qr_scan_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,12 +40,11 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController bioController = TextEditingController();
 
   Uint8List? _imageBytes;
-  List<String> links = [];
+  List<Map<String, String>> contacts = [];
 
   @override
   void initState() {
     super.initState();
-    _loadUserData(); // Загружаем данные при запуске
   }
 
   final Map<String, IconData> domainIcons = {
@@ -58,61 +56,69 @@ class _MyHomePageState extends State<MyHomePage> {
     'web.telegram.org': FontAwesomeIcons.telegram,
   };
 
-  void _addLink() {
+  String _determineType(String input) {
+    final Uri? uri = Uri.tryParse(input);
+    
+    if (input.contains(RegExp(r'^\+?[0-9\s\-]+$'))) {
+      return 'phone'; // Номер телефона
+    } else if (input.contains(RegExp(r'^[^@]+@[^@]+\.[^@]+'))) {
+      return 'email'; // Email
+    } else if (uri != null && uri.hasAbsolutePath) {
+      return 'url'; // URL
+    }
+    
+    return 'unknown'; // Неизвестный тип
+  }
+
+  void _addContact() {
     setState(() {
-      final link = linkController.text;
-      if (link.isNotEmpty && Uri.tryParse(link)?.hasAbsolutePath == true) {
-        links.add(link);
+      final input = linkController.text;
+      final type = _determineType(input); // Определить тип контакта
+
+      if (input.isNotEmpty && type != 'unknown') {
+        contacts.add({'type': type, 'value': input});
         linkController.clear(); 
       }
     });
   }
 
-  Future<void> _launchURL(String url) async {
+  Future<void> _launchContact(String type, String value) async {
+    String url;
+    switch (type) {
+      case 'phone':
+        url = 'tel:$value';
+        break;
+      case 'email':
+        url = 'mailto:$value';
+        break;
+      case 'url':
+        url = value;
+        break;
+      default:
+        throw 'Неизвестный тип контакта';
+    }
+    
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri)) {
       throw 'Не удалось открыть $url';
     }
   }
 
-  IconData _getIconForLink(String url) {
-    Uri uri = Uri.parse(url);
-    String? domain = uri.host;
-    
-    if (domainIcons.containsKey(domain)) {
-      return domainIcons[domain]!;
+  IconData _getIconForContact(String type, String value) {
+    if (type == 'phone') {
+      return Icons.phone;
+    } else if (type == 'email') {
+      return Icons.email;
+    } else if (type == 'url') {
+      Uri uri = Uri.parse(value);
+      String? domain = uri.host;
+      if (domainIcons.containsKey(domain)) {
+        return domainIcons[domain]!;
+      }
+      return Icons.link;
     }
-    
-    return Icons.link;
+    return Icons.help; 
   }
-
-  Future<void> _saveUserData(Uint8List? imageBytes) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  
-  await prefs.setString('userName', nameController.text);
-  await prefs.setString('userBio', bioController.text);
-
-  if (imageBytes != null) {
-    String base64Image = base64Encode(imageBytes);
-    await prefs.setString('userImage', base64Image);
-  } else {
-    await prefs.remove('userImage'); 
-  }
-}
-
-  Future<void> _loadUserData() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  setState(() {
-    nameController.text = prefs.getString('userName') ?? '';
-    bioController.text = prefs.getString('userBio') ?? '';
-
-    String? base64Image = prefs.getString('userImage');
-    if (base64Image != null) {
-      Uint8List imageBytes = base64Decode(base64Image);
-      _imageBytes = imageBytes;
-    }
-  });
-}
 
   Future<void> pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -166,65 +172,54 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(height: 16),
-
               TextField(
                 controller: bioController,
                 decoration: const InputDecoration(
                   labelText: 'Краткая биография',
                   border: OutlineInputBorder(),
                 ),
-                maxLines: 3, 
-              ),
-              const SizedBox(height: 16),
-
-              ElevatedButton(
-                onPressed: () {
-                  _saveUserData(_imageBytes); 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Данные сохранены')),
-                  );
-                },
-                child: const Text('Сохранить'),
+                maxLines: 2, 
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: linkController,
                 decoration: const InputDecoration(
-                  labelText: 'Введите ссылку',
-                  hintText: 'https://example.com',
+                  labelText: 'Введите ссылку, номер телефона или email',
+                  hintText: 'https://example.com, +123456789, example@email.com',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.url,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: _addLink,
-                child: const Text('Добавить ссылку'),
+                onPressed: _addContact,
+                child: const Text('Добавить'),
               ),
               const SizedBox(height: 20),
-              if (links.isNotEmpty)
+              if (contacts.isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true, 
                   physics: const NeverScrollableScrollPhysics(), 
-                  itemCount: links.length,
+                  itemCount: contacts.length,
                   itemBuilder: (context, index) {
+                    final contact = contacts[index];
                     return ListTile(
                       title: InkWell(
-                        onTap: () => _launchURL(links[index]),
+                        onTap: () => _launchContact(contact['type']!, contact['value']!),
                         child: Text(
-                          links[index],
+                          contact['value']!,
                           style: const TextStyle(
                             color: Colors.blue,
                             decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
-                      leading: Icon(_getIconForLink(links[index])),
+                      leading: Icon(_getIconForContact(contact['type']!, contact['value']!)),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
                           setState(() {
-                            links.removeAt(index);
+                            contacts.removeAt(index);
                           });
                         },
                       ),
@@ -232,22 +227,49 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 )
               else
-                const Center(child: Text('Список ссылок пуст')),
+                const Center(child: Text('Список пуст')),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const QRCodePage()),
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.qr_code_scanner),
+                    title: const Text('Сканировать QR-код'),
+                    onTap: () {
+                      Navigator.pop(context); // Закрываем BottomSheet
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const QRScanPage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.qr_code),
+                    title: const Text('Сгенерировать QR-код'),
+                    onTap: () {
+                      Navigator.pop(context); // Закрываем BottomSheet
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const QRCodePage()),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
           );
         },
-        tooltip: 'Сгенерировать QR-код',
+        tooltip: 'Действия с QR-кодами',
         child: const Icon(Icons.qr_code),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
