@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRScanPage extends StatefulWidget {
-  const QRScanPage({Key? key}) : super(key: key);
+  const QRScanPage ({super.key});
 
   @override
   State<StatefulWidget> createState() => _QRScanPageState();
@@ -16,7 +16,6 @@ class _QRScanPageState extends State<QRScanPage> {
   @override
   void reassemble() {
     super.reassemble();
-    // Для iOS необходимо приостановить и возобновить камеру при переключении
     controller?.pauseCamera();
     controller?.resumeCamera();
   }
