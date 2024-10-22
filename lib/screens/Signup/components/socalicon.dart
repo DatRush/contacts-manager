@@ -6,10 +6,10 @@ class SocalIcon extends StatelessWidget {
   final String iconsrc;
   final VoidCallback press;
   const SocalIcon({
-    super.key,
+    Key? key,
     required this.iconsrc,
     required this.press,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,13 +19,17 @@ class SocalIcon extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 10),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          border: Border.all(width: 2, color: Colors.black),
+
+          border: Border.all(width: 2, color: const Color.fromARGB(255, 91, 238, 157)),
+
           shape: BoxShape.circle,
         ),
         child: SvgPicture.asset(
           iconsrc,
-          height: 20,
-          width: 20,
+
+          height: 40,
+          width: 40,
+
         ),
       ),
     );

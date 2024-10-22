@@ -1,15 +1,17 @@
 import 'package:flut1/screens/Welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'screens/Main/contact_model.dart';
-import 'screens/Signup/signup_screen.dart';  
-import 'screens/Login/login_screen.dart';    
+import 'package:flut1/screens/Welcome/welcome_screen.dart';
+import 'package:flut1/providers/contact_model.dart';
+import 'package:flut1/providers/auth_model.dart'; // Импортируем AuthProvider
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ContactModel(), 
+    MultiProvider( // Изменяем на MultiProvider для поддержки нескольких провайдеров
+      providers: [
+        ChangeNotifierProvider(create: (_) => ContactModel()), // Модель для контактов
+        ChangeNotifierProvider(create: (_) => AuthModel()), // Модель для авторизации
+      ],
       child: const MyApp(),
     ),
   );

@@ -1,13 +1,15 @@
-import 'package:flut1/screens/Signup/signup_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flut1/screens/Welcome/components/background.dart';
-import 'package:flut1/screens/login/login_screen.dart';
 import 'package:flutter_svg/svg.dart';
+
 import 'package:flut1/components/rounded_button.dart';
 
-class Body extends StatelessWidget {
-  const Body({super.key});
+import 'package:flut1/screens/signup/signup_screen.dart';
+import 'package:flut1/screens/Welcome/components/background.dart';
+import 'package:flut1/screens/login/login_screen.dart';
 
+
+
+class Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -18,15 +20,32 @@ class Body extends StatelessWidget {
           children: [
             const Text(
               "Test",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.03),
             SvgPicture.asset(
-              'assets/pictures/images.svg',
+              'assets/pictures/placeholder.svg',
+
               height: size.height * 0.3,
             ),
             SizedBox(height: size.height * 0.03),
             RoundedButton(
+              text: 'SIGNUP',
+              color: const Color.fromARGB(180, 4, 221, 236),
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+
+                      return SignupScreen();
+                    },
+                  ),
+                );
+              },
+            ),
+            RoundedButton(
+
               text: 'LOGIN',
               press: () {
                 Navigator.push(
@@ -34,21 +53,6 @@ class Body extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) {
                       return LoginScreen();
-                    },
-                  ),
-                );
-              },
-            ),
-            RoundedButton(
-              text: 'SIGNUP',
-              color: const Color.fromARGB(255, 166, 198, 255),
-              textColor: Colors.black,
-              press: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return RegisterScreen();
                     },
                   ),
                 );
