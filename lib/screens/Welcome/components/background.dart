@@ -3,36 +3,27 @@ import 'package:flutter/material.dart';
 class Background extends StatelessWidget {
   final Widget child;
   const Background({
-      Key? key,
-      required this.child,
-    }
-  ) : super(key: key);
-  
+    Key? key,
+    required this.child,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Container(
+    return SizedBox(
       height: size.height,
       width: double.infinity,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
+          // SVG картинка для заднего фона
+          Positioned.fill(
             child: Image.asset(
-              'assets/pictures/circle.jpg',
-              width: size.width * 0.1,
-            )
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: Image.asset(
-              'assets/pictures/circle.jpg',
-              width: size.width * 0.05,
+              'assets/background/welcome.jpg',
+              fit: BoxFit.cover,
             ),
           ),
+          // Дочерний элемент (контент)
           child,
         ],
       ),

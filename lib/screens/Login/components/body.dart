@@ -27,13 +27,13 @@ class Body extends StatelessWidget {
         children: [
           const Text(
             'LOGIN',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SizedBox(
             height: size.height * 0.03,
           ),
           SvgPicture.asset(
-            'assets/pictures/images.svg',
+            'assets/pictures/placeholder.svg',
             height: size.height * 0.3,
           ),
           SizedBox(
@@ -55,6 +55,7 @@ class Body extends StatelessWidget {
           // Кнопка для входа
           RoundedButton(
             text: authProvider.isLoading ? 'LOADING...' : 'LOGIN',
+            color: const Color.fromARGB(180, 4, 221, 236),
             press: () async {
               await authProvider.login();
               if (authProvider.errorMessage == null) {

@@ -20,14 +20,28 @@ class Body extends StatelessWidget {
           children: [
             const Text(
               "Test",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.03),
             SvgPicture.asset(
-              'assets/pictures/images.svg',
+              'assets/pictures/placeholder.svg',
               height: size.height * 0.3,
             ),
             SizedBox(height: size.height * 0.03),
+            RoundedButton(
+              text: 'SIGNUP',
+              color: const Color.fromARGB(180, 4, 221, 236),
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return SignupScreen();
+                    },
+                  ),
+                );
+              },
+            ),
             RoundedButton(
               text: 'LOGIN',
               press: () {
@@ -36,21 +50,6 @@ class Body extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) {
                       return LoginScreen();
-                    },
-                  ),
-                );
-              },
-            ),
-            RoundedButton(
-              text: 'SIGNUP',
-              color: const Color.fromARGB(255, 166, 198, 255),
-              textColor: Colors.black,
-              press: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return SignupScreen();
                     },
                   ),
                 );

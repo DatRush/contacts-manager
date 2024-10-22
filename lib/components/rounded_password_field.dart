@@ -21,6 +21,7 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
       child: TextField(
         obscureText: _isObscure, // Управляем видимостью текста
         onChanged: widget.onChanged,
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintText: 'Password',
           icon: const Icon(

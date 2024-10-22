@@ -28,11 +28,11 @@ class Body extends StatelessWidget {
         children: [
           const Text(
             'SIGNUP',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: size.height * 0.03),
           SvgPicture.asset(
-            'assets/pictures/images.svg',
+            'assets/pictures/placeholder.svg',
             height: size.height * 0.3,
           ),
           // Поле для ввода email
@@ -57,6 +57,7 @@ class Body extends StatelessWidget {
           // Кнопка для регистрации
           RoundedButton(
             text: authProvider.isLoading ? 'LOADING...' : 'SIGNUP',
+            color: const Color.fromARGB(180, 4, 221, 236),
             press: () async {
               await authProvider.signUp(); // Выполняем регистрацию
               if (authProvider.errorMessage == null) {
@@ -98,9 +99,9 @@ class Body extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SocalIcon(iconsrc: 'assets/pictures/images.svg', press: () {}),
-              SocalIcon(iconsrc: 'assets/pictures/images.svg', press: () {}),
-              SocalIcon(iconsrc: 'assets/pictures/images.svg', press: () {}),
+              SocalIcon(iconsrc: 'assets/pictures/google.svg', press: () {}),
+              SocalIcon(iconsrc: 'assets/pictures/facebook.svg', press: () {}),
+              SocalIcon(iconsrc: 'assets/pictures/x.svg', press: () {}),
             ],
           ),
         ],

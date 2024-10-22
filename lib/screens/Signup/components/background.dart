@@ -15,7 +15,15 @@ class Background extends StatelessWidget {
       width: size.width,
       child: Stack(
         alignment: Alignment.center,
-        children: [child],
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/background/signup.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          child
+        ],
       ),
     );
   }

@@ -17,17 +17,11 @@ class Background extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            width: size.width * 0.1,
-            child: Image.asset('assets/pictures/circle.jpg'),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            width: size.width * 0.1,
-            child: Image.asset('assets/pictures/circle.jpg'),
+          Positioned.fill(
+            child: Image.asset(
+              'assets/background/login.jpg',
+              fit: BoxFit.cover,
+            ),
           ),
           child,
         ],

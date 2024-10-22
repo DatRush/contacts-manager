@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
       title: 'Test01',
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 20, 90, 124),
-        scaffoldBackgroundColor: const Color.fromARGB(255, 235, 234, 234),
         useMaterial3: true,
       ),
       home: WelcomeScreen(), // Начальная страница - экран приветствия

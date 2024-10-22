@@ -17,7 +17,7 @@ class AlreadyHAACheck extends StatelessWidget {
       children: [
         Text(
           login ? "Don't have an account?" : "Already have an Account?",
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(color: Color.fromARGB(255, 251, 252, 252)),
         ),
         GestureDetector(
           onTap: press,
@@ -25,7 +25,7 @@ class AlreadyHAACheck extends StatelessWidget {
             login ?
             ' SIGN UP' : ' SIGN IN',
             style: const TextStyle(
-              color: Colors.black,
+              color: Color.fromARGB(255, 0, 255, 157),
               fontWeight: FontWeight.bold,
             ),
           ),
