@@ -19,6 +19,7 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: TextField(
+
         obscureText: _isObscure, // Управляем видимостью текста
         onChanged: widget.onChanged,
         style: const TextStyle(color: Colors.white),

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-
 import 'package:flut1/components/already_haa_check.dart';
 import 'package:flut1/components/rounded_button.dart';
 import 'package:flut1/components/rounded_input_field.dart';
 import 'package:flut1/components/rounded_password_field.dart';
-
 import 'package:flut1/screens/Login/components/background.dart';
 import 'package:flut1/screens/Signup/signup_screen.dart';
 import 'package:flut1/screens/Main/mainpage.dart';
@@ -19,6 +17,7 @@ class Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     final authProvider = Provider.of<AuthModel>(context);
 
     return Background(
@@ -27,6 +26,7 @@ class Body extends StatelessWidget {
         children: [
           const Text(
             'LOGIN',
+
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SizedBox(
@@ -79,7 +79,6 @@ class Body extends StatelessWidget {
           SizedBox(
             height: size.height * 0.03,
           ),
-          // Переход на страницу регистрации
           AlreadyHAACheck(
             press: () {
               Navigator.push(

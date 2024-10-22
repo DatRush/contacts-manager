@@ -1,3 +1,4 @@
+import 'package:flut1/screens/Welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flut1/screens/Welcome/welcome_screen.dart';
@@ -25,9 +26,15 @@ class MyApp extends StatelessWidget {
       title: 'Test01',
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 20, 90, 124),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 235, 234, 234),
         useMaterial3: true,
       ),
-      home: WelcomeScreen(), // Начальная страница - экран приветствия
+      initialRoute: '/', 
+      routes: {
+        '/': (context) => WelcomeScreen(),  
+        '/login': (context) => LoginScreen(),  
+        '/register': (context) => RegisterScreen(),
+      },
     );
   }
 }

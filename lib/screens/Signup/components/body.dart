@@ -11,6 +11,7 @@ import 'package:flut1/screens/Login/login_screen.dart';
 import 'package:flut1/screens/Main/mainpage.dart';
 import 'package:flut1/screens/Signup/components/ordivider.dart';
 import 'package:flut1/screens/Signup/components/socalicon.dart';
+
 import 'package:flut1/screens/Signup/components/background.dart';
 
 import 'package:flut1/providers/auth_model.dart';

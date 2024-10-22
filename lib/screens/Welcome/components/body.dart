@@ -25,6 +25,7 @@ class Body extends StatelessWidget {
             SizedBox(height: size.height * 0.03),
             SvgPicture.asset(
               'assets/pictures/placeholder.svg',
+
               height: size.height * 0.3,
             ),
             SizedBox(height: size.height * 0.03),
@@ -36,6 +37,7 @@ class Body extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
+
                       return SignupScreen();
                     },
                   ),
@@ -43,6 +45,7 @@ class Body extends StatelessWidget {
               },
             ),
             RoundedButton(
+
               text: 'LOGIN',
               press: () {
                 Navigator.push(
