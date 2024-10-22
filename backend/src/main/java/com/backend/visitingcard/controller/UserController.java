@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -27,10 +28,9 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    // Создание пользователя с обработкой ошибок
-    @PostMapping
+    // Создание нового пользователя
+    @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        // Проверка на отсутствие полей
         if (user.getUsername() == null || user.getUsername().isEmpty()) {
             return ResponseEntity.badRequest().body("Имя пользователя не может быть пустым.");
         }
@@ -41,7 +41,6 @@ public class UserController {
             return ResponseEntity.badRequest().body("Email не может быть пустым.");
         }
 
-        // Проверка на уникальность email и username
         if (userService.existsByEmail(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Этот email уже используется.");
         }
@@ -49,13 +48,26 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Это имя пользователя уже занято.");
         }
 
-        // Сохранение пользователя
         try {
             User newUser = userService.createUser(user);
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Произошла ошибка при создании пользователя.");
+                    .body("Ошибка при создании пользователя.");
+        }
+    }
+
+    // Вход в профиль
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginData) {
+        String username = loginData.get("username");
+        String password = loginData.get("password");
+
+        Optional<User> user = userService.authenticateUser(username, password);
+        if (user.isPresent()) {
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверные учетные данные.");
         }
     }
 }
