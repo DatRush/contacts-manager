@@ -9,15 +9,17 @@ import 'package:flut1/components/rounded_password_field.dart';
 
 import 'package:flut1/screens/Login/login_screen.dart';
 import 'package:flut1/screens/Main/mainpage.dart';
-import 'package:flut1/screens/Signup/components/ordivider.dart';
-import 'package:flut1/screens/Signup/components/socalicon.dart';
+import 'package:flut1/screens/Register/components/ordivider.dart';
+import 'package:flut1/screens/Register/components/socalicon.dart';
 
-import 'package:flut1/screens/Signup/components/background.dart';
+import 'package:flut1/screens/Register/components/background.dart';
 
 import 'package:flut1/providers/auth_model.dart';
 
 
 class Body extends StatelessWidget {
+  const Body({Key? key}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthModel>(context); // Получаем доступ к AuthProvider
@@ -28,17 +30,21 @@ class Body extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            'SIGNUP',
+            'REGISTER',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: size.height * 0.03),
-          SvgPicture.asset(
-            'assets/pictures/placeholder.svg',
-            height: size.height * 0.3,
+          // Поле для ввода имени пользователя
+          RoundedInputField(
+            hintText: 'Username',
+            onChanged: (value) {
+              authProvider.setUsername(value); // Сохраняем username в AuthProvider
+            },
           ),
           // Поле для ввода email
           RoundedInputField(
             hintText: 'Email',
+            icon: Icons.mail,
             onChanged: (value) {
               authProvider.setEmail(value); // Сохраняем email в AuthProvider
             },
@@ -57,12 +63,17 @@ class Body extends StatelessWidget {
             ),
           // Кнопка для регистрации
           RoundedButton(
-            text: authProvider.isLoading ? 'LOADING...' : 'SIGNUP',
+            text: authProvider.isLoading ? 'LOADING...' : 'REGISTER',
             color: const Color.fromARGB(180, 4, 221, 236),
-            press: () async {
-              await authProvider.signUp(); // Выполняем регистрацию
-              if (authProvider.errorMessage == null) {
-                // Если регистрация прошла успешно, перенаправляем на главную страницу
+            press: authProvider.isLoading ? null : () async {
+              bool success = await authProvider.signUp();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(success ? 'Регистрация прошла успешно' : authProvider.errorMessage ?? 'Ошибка')),
+              );
+
+              if (success) {
+                authProvider.clearError(); // Сброс ошибок перед переходом
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -70,14 +81,6 @@ class Body extends StatelessWidget {
                       return const MyHomePage();
                     },
                   ),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(authProvider.errorMessage!)),
-                );
-              } else {
-                // Если ошибка, показываем сообщение
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(authProvider.errorMessage!)),
                 );
               }
             },
@@ -96,7 +99,7 @@ class Body extends StatelessWidget {
               );
             },
           ),
-          OrDivider(),
+          const OrDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

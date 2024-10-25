@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:provider/provider.dart';
 import 'package:flut1/providers/contact_model.dart';
 import 'qr_gen_page.dart';
 import 'qr_scan_page.dart';

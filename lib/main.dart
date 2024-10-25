@@ -1,9 +1,12 @@
+import 'package:flut1/screens/Login/login_screen.dart';
+import 'package:flut1/screens/Register/register_screen.dart';
 import 'package:flut1/screens/Welcome/welcome_screen.dart';
+
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import 'package:flut1/screens/Welcome/welcome_screen.dart';
 import 'package:flut1/providers/contact_model.dart';
-import 'package:flut1/providers/auth_model.dart'; // Импортируем AuthProvider
+import 'package:flut1/providers/auth_model.dart'; 
 
 void main() {
   runApp(
@@ -31,7 +34,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/', 
       routes: {
-        '/': (context) => WelcomeScreen(),  
+        '/': (context) => const WelcomeScreen(),
         '/login': (context) => LoginScreen(),  
         '/register': (context) => RegisterScreen(),
       },

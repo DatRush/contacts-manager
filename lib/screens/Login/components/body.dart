@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+
 import 'package:flut1/components/already_haa_check.dart';
 import 'package:flut1/components/rounded_button.dart';
 import 'package:flut1/components/rounded_input_field.dart';
 import 'package:flut1/components/rounded_password_field.dart';
+
 import 'package:flut1/screens/Login/components/background.dart';
-import 'package:flut1/screens/Signup/signup_screen.dart';
+import 'package:flut1/screens/Register/register_screen.dart';
 import 'package:flut1/screens/Main/mainpage.dart';
 
 import 'package:flut1/providers/auth_model.dart';
@@ -26,7 +28,6 @@ class Body extends StatelessWidget {
         children: [
           const Text(
             'LOGIN',
-
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SizedBox(
@@ -41,6 +42,7 @@ class Body extends StatelessWidget {
           ),
           // Поле для email
           RoundedInputField(
+            icon: Icons.mail,
             hintText: 'Email',
             onChanged: (value) {
               authProvider.setEmail(value);
@@ -56,22 +58,22 @@ class Body extends StatelessWidget {
           RoundedButton(
             text: authProvider.isLoading ? 'LOADING...' : 'LOGIN',
             color: const Color.fromARGB(180, 4, 221, 236),
-            press: () async {
-              await authProvider.login();
-              if (authProvider.errorMessage == null) {
-                // Если вход успешен, перенаправляем на главную страницу
+            press: authProvider.isLoading ? null : () async {
+              bool success = await authProvider.login();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(success ? 'Вход прошел успешно' : authProvider.errorMessage ?? 'Ошибка')),
+              );
+
+              if (success) {
+                authProvider.clearError(); // Сброс ошибок перед переходом
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return const MyHomePage(); // Главная страница после входа
+                      return const MyHomePage();
                     },
                   ),
-                );
-              } else {
-                // Показываем сообщение об ошибке, если вход не удался
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(authProvider.errorMessage!)),
                 );
               }
             },
@@ -85,7 +87,7 @@ class Body extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return SignupScreen();
+                    return RegisterScreen();
                   },
                 ),
               );

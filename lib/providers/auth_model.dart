@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flut1/services/api_service.dart';
 
 class AuthModel with ChangeNotifier {
   String _email = '';
   String _password = '';
+  String _username = '';
   bool _isLoading = false;
   String? _errorMessage;
   String? _validateMessage;
 
   String get email => _email;
   String get password => _password;
+  String get username => _username;
+
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get validateMessage => _validateMessage;
+
+  final ApiService apiService = ApiService();
 
   // Регулярное выражение для email и пароля
   RegExp emailRegex = RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
@@ -20,64 +26,75 @@ class AuthModel with ChangeNotifier {
   // Установка email с проверкой
   void setEmail(String email) {
     _email = email;
-    if (!emailRegex.hasMatch(email)) {
-      _validateMessage = 'Некорректный формат email';
-    } else {
-      _validateMessage = null;
-    }
+    _validateMessage = emailRegex.hasMatch(email) ? null : 'Некорректный формат email';
     notifyListeners();
   }
 
   // Установка пароля с проверкой
   void setPassword(String password) {
     _password = password;
-    if (!passwordRegex.hasMatch(password)) {
-      _validateMessage = 'Условие пароля: длина 8, цифра, спец. символ';
-    } else {
-      _validateMessage = null;
-    }
+    _validateMessage = passwordRegex.hasMatch(password) ? null : 'Условие пароля: длина 8, цифра, спец. символ';
+    notifyListeners();
+  }
+
+  // Установка имени пользователя
+  void setUsername(String username) {
+    _username = username;
     notifyListeners();
   }
 
   // Логин
-  Future<void> login() async {
+  Future<bool> login() async {
     _isLoading = true;
     notifyListeners();
-    
-    await Future.delayed(const Duration(seconds: 2)); // Симуляция запроса
 
-    // Пример успешного входа
-    if (_email == 'test@test.com' && _password == 'Password@123') {
-      _errorMessage = null; // Сброс ошибки
+    bool success = await apiService.loginUser(
+      _username,
+      _password,
+    );
+
+    if (success) {
+      _username = '';
+      _password = '';
+      notifyListeners();
     } else {
-      _errorMessage = 'Неверный email или пароль';
+      _errorMessage = 'Неверные учетные данные';
     }
 
     _isLoading = false;
     notifyListeners();
+    return success;
   }
 
   // Регистрация
-  Future<void> signUp() async {
+  Future<bool> signUp() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
-    
-    await Future.delayed(const Duration(seconds: 2)); // Симуляция запроса
 
-    // Валидация email и пароля при регистрации
-    if (emailRegex.hasMatch(_email) && passwordRegex.hasMatch(_password)) {
-      _errorMessage = null; // Успешная регистрация
+    if (_validateMessage != null) {
+      _isLoading = false;
+      return false;
+    }
+
+    bool success = await apiService.registerUser(
+      _username,
+      _password,
+      _email,
+    );
+
+    if (success) {
+      _username = '';
+      _password = '';
+      _email = '';
+      notifyListeners();
     } else {
-      if (!emailRegex.hasMatch(_email)) {
-        _errorMessage = 'Некорректный email';
-      }
-      if (!passwordRegex.hasMatch(_password)) {
-        _errorMessage = 'Некорректный пароль';
-      }
+      _errorMessage = 'Ошибка регистрации';
     }
 
     _isLoading = false;
     notifyListeners();
+    return success;
   }
 
   // Сброс ошибок

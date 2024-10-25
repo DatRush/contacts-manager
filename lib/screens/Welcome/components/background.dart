@@ -16,7 +16,6 @@ class Background extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-
           // SVG картинка для заднего фона
           Positioned.fill(
             child: Image.asset(

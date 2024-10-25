@@ -28,9 +28,7 @@ class AlreadyHAACheck extends StatelessWidget {
             login ?
             ' SIGN UP' : ' SIGN IN',
             style: const TextStyle(
-
               color: Color.fromARGB(255, 0, 255, 157),
-
               fontWeight: FontWeight.bold,
             ),
           ),
