@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/svg.dart';
 
 import 'package:flut1/components/already_haa_check.dart';
 import 'package:flut1/components/rounded_button.dart';

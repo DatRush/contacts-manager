@@ -20,6 +20,42 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController linkController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
+  final TextEditingController infoController = TextEditingController(); 
+  final TextEditingController positionController = TextEditingController(); 
+  final TextEditingController organizationController = TextEditingController();
+
+  final FocusNode nameFocusNode = FocusNode();
+  final FocusNode positionFocusNode = FocusNode();
+
+  bool showPositionField = false;
+
+  @override
+  void initState() {
+    super.initState();
+    nameFocusNode.addListener(_handleFocusChange);
+    positionFocusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    if (nameFocusNode.hasFocus) {
+      setState(() {
+        showPositionField = true; // Показать поле должности при фокусе на поле имени
+      });
+    } else if (!positionFocusNode.hasFocus && positionController.text.isEmpty) {
+      setState(() {
+        showPositionField = false; // Скрыть поле, если оно пусто и не в фокусе
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    positionController.dispose();
+    nameFocusNode.dispose();
+    positionFocusNode.dispose();
+    super.dispose();
+  }
 
   final Map<String, IconData> domainIcons = {
     'web.whatsapp.com': FontAwesomeIcons.whatsapp,
@@ -31,10 +67,12 @@ class _MyHomePageState extends State<MyHomePage> {
   };
 
   void _addContact() {
+    final info = infoController.text;
     final input = linkController.text;
     final type = _determineType(input);
     if (input.isNotEmpty && type != 'unknown') {
-      Provider.of<ContactModel>(context, listen: false).addContact(type, input);
+      Provider.of<ContactModel>(context, listen: false).addContact(type, input, info);
+      infoController.clear();
       linkController.clear();
     }
   }
@@ -104,157 +142,247 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => pickImage(context),
-                child: Consumer<ContactModel>(
-                  builder: (context, model, child) {
-                    return CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey[300],
-                      backgroundImage: model.imageBytes != null
-                          ? MemoryImage(model.imageBytes!)
-                          : null,
-                      child: model.imageBytes == null
-                          ? const Icon(
-                              Icons.person,
-                              size: 50,
-                              color: Colors.white,
-                            )
-                          : null,
-                    );
-                  },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ЛЕВЫЙ СТОЛБЕЦ
+            Expanded(
+              flex: 1,
+              child: Card(
+                elevation: 4,
+                margin: const EdgeInsets.all(8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              const SizedBox(height: 16),
-              // Строка с линией и полем для имени
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 3, // Толщина линии
-                    height: 40, // Высота линии, можно настроить
-                    color: const Color.fromARGB(255, 39, 57, 160),
-                    margin: const EdgeInsets.only(right: 8.0), // Отступ между линией и полем
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Имя',
-                        border: InputBorder.none,
-                        isDense: true, // Уменьшение высоты
-                        contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Строка с линией и полем для биографии
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 3, // Толщина линии
-                    height: 40, // Высота линии, можно настроить
-                    color: Color.fromARGB(255, 39, 57, 160),
-                    margin: const EdgeInsets.only(right: 8.0), // Отступ между линией и полем
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: bioController,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Био',
-                        isDense: true, // Уменьшение высоты
-                        contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      ),
-                      maxLines: 2,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-              TextField(
-                controller: linkController,
-                decoration: const InputDecoration(
-                  labelText: 'Введите ссылку, номер телефона или email',
-                  hintText: 'https://example.com, +123456789, example@email.com',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.url,
-                onSubmitted: (value) {
-                  _addContact();
-                },
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _addContact,
-                child: const Text('Добавить'),
-              ),
-              const SizedBox(height: 20),
-              Consumer<ContactModel>(
-                builder: (context, model, child) {
-                  return model.contacts.isNotEmpty
-                      ? ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: model.contacts.length,
-                          itemBuilder: (context, index) {
-                            final contact = model.contacts[index];
-                            return Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: ListTile(
-                                title: InkWell(
-                                  onTap: () => _launchContact(contact['type']!, contact['value']!),
-                                  child: Text(
-                                    contact['value']!,
-                                    style: const TextStyle(
-                                      color: Colors.blue,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Фото
+                      Center(
+                        child: GestureDetector(
+                          onTap: () => pickImage(context),
+                          child: Consumer<ContactModel>(
+                            builder: (context, model, child) {
+                              return Container(
+                                width: 150,
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  image: model.imageBytes != null
+                                      ? DecorationImage(
+                                          image: MemoryImage(model.imageBytes!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : null,
+                                  border: Border.all(width: 2),
+                                  borderRadius: BorderRadius.circular(75),
                                 ),
-                                leading: Icon(_getIconForContact(contact['type']!, contact['value']!)),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () {
-                                    Provider.of<ContactModel>(context, listen: false).removeContact(index);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: AnimatedTextKit(
-                            animatedTexts: [
-                              TyperAnimatedText(
-                                'Список пуст',
-                                textStyle: const TextStyle(
-                                  fontSize: 24.0,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                            totalRepeatCount: 1, // Однократное повторение анимации
+                                child: model.imageBytes == null
+                                    ? const Center(
+                                        child: Icon(Icons.person, size: 50),
+                                      )
+                                    : null,
+                              );
+                            },
                           ),
-                        );
-                },
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(),
+                      TextField(
+                        controller: nameController,
+                        focusNode: nameFocusNode,
+                        decoration: const InputDecoration(
+                          hintText: 'Введите имя',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                        ),
+                      ),
+                      // Анимация появления поля должности
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.decelerate,
+                        height: showPositionField ? 60 : 0, // Управляем высотой
+                        child: ClipRect(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            heightFactor: showPositionField ? 1.0 : 0.0, // Высота раскрытия
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0),
+                              child: TextField(
+                                controller: positionController,
+                                focusNode: positionFocusNode,
+                                decoration: const InputDecoration(
+                                  hintText: 'Введите должность',
+                                  border: OutlineInputBorder(
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                  ),
+                                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Био
+                      TextField(
+                        controller: bioController,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          hintText: 'Введите краткое описание',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Кнопка сохранения
+                      Center(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                          },
+                          icon: const Icon(Icons.save),
+                          label: const Text('Сохранить'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 16),
+            // ПРАВЫЙ СТОЛБЕЦ
+            Expanded(
+              flex: 2,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: IconButton(
+                        icon: const Icon(Icons.add, size: 30),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Добавить контакт'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextField(
+                                      controller: infoController,
+                                      maxLines: 3,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Информация',
+                                        hintText: 'Содержимое',
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextField(
+                                      controller: linkController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Ссылка, номер или email',
+                                        hintText: 'https://example.com, +123456789, example@email.com',
+                                      ),
+                                      keyboardType: TextInputType.url,
+                                    ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Отмена'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _addContact();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Добавить'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Consumer<ContactModel>(
+                      builder: (context, model, child) {
+                        return model.contacts.isNotEmpty
+                            ? ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: model.contacts.length,
+                                itemBuilder: (context, index) {
+                                  final contact = model.contacts[index];
+                                  return Card(
+                                    elevation: 5,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: ListTile(
+                                      title: InkWell(
+                                        onTap: () => _launchContact(contact['type']!, contact['value']!),
+                                        child: Text(
+                                          contact['info']!,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      leading: Container(
+                                        width: 50,
+                                        height: double.infinity,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: const Color(0xFFFF5722), width: 1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          _getIconForContact(contact['type']!, contact['value']!),
+                                          size: 40,
+                                        ),
+                                      ),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () {
+                                          Provider.of<ContactModel>(context, listen: false).removeContact(index);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              )
+                            : Center(
+                                child: AnimatedTextKit(
+                                  animatedTexts: [
+                                    TyperAnimatedText(
+                                      'Список пуст',
+                                      textStyle: const TextStyle(
+                                        fontSize: 24.0,
+                                      ),
+                                    ),
+                                  ],
+                                  totalRepeatCount: 1,
+                                ),
+                              );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(

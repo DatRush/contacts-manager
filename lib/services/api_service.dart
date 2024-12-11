@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://localhost:8080/api';  // Укажите адрес сервера
+  final String baseUrl = 'http://localhost:8081/api';  // Укажите адрес сервера
 
   Future<bool> registerUser(String username, String password, String email) async {
     final response = await http.post(

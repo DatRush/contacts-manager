@@ -12,8 +12,8 @@ class ContactModel with ChangeNotifier {
   Uint8List? get imageBytes => _imageBytes;
 
   // Метод для добавления контакта
-  void addContact(String type, String value) {
-    _contacts.add({'type': type, 'value': value});
+  void addContact(String type, String value, String info) {
+    _contacts.add({'type': type, 'value': value, 'info': info});
     notifyListeners(); // Уведомляем виджеты об изменении состояния
   }
 
