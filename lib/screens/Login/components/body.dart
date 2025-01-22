@@ -1,20 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
-
-import 'package:flut1/components/already_haa_check.dart';
-import 'package:flut1/components/rounded_button.dart';
-import 'package:flut1/components/rounded_input_field.dart';
-import 'package:flut1/components/rounded_password_field.dart';
-
 import 'package:flut1/screens/Login/components/background.dart';
 import 'package:flut1/screens/Register/register_screen.dart';
 import 'package:flut1/screens/Main/mainpage.dart';
-
-import 'package:flut1/providers/auth_model.dart';
+import 'package:flut1/imports.dart';
 
 class Body extends StatelessWidget {
-  const Body({Key? key}) : super(key: key);
+  const Body({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +30,6 @@ class Body extends StatelessWidget {
           SizedBox(
             height: size.height * 0.03,
           ),
-          // Поле для email
           RoundedInputField(
             icon: Icons.mail,
             hintText: 'Email',
@@ -48,7 +37,6 @@ class Body extends StatelessWidget {
               authProvider.setEmail(value);
             },
           ),
-          // Поле для пароля
           RoundedPasswordField(
             onChanged: (value) {
               authProvider.setPassword(value);
@@ -101,7 +89,7 @@ class Body extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return RegisterScreen();
+                    return const RegisterScreen();
                   },
                 ),
               );

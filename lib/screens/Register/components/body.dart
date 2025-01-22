@@ -1,27 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'package:flut1/components/already_haa_check.dart';
-import 'package:flut1/components/rounded_button.dart';
-import 'package:flut1/components/rounded_input_field.dart';
-import 'package:flut1/components/rounded_password_field.dart';
-
+import 'package:flut1/imports.dart';
 import 'package:flut1/screens/Login/login_screen.dart';
 import 'package:flut1/screens/Main/mainpage.dart';
 import 'package:flut1/screens/Register/components/ordivider.dart';
 import 'package:flut1/screens/Register/components/socalicon.dart';
-
 import 'package:flut1/screens/Register/components/background.dart';
 
-import 'package:flut1/providers/auth_model.dart';
 
 
 class Body extends StatelessWidget {
-  const Body({Key? key}) : super(key: key);
+  const Body({super.key});
   
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthModel>(context); // Получаем доступ к AuthProvider
+    final authProvider = Provider.of<AuthModel>(context); 
     Size size = MediaQuery.of(context).size;
 
     return Background(
@@ -33,47 +24,44 @@ class Body extends StatelessWidget {
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: size.height * 0.03),
-          // Поле для ввода имени пользователя
           RoundedInputField(
             hintText: 'Username',
             onChanged: (value) {
-              authProvider.setUsername(value); // Сохраняем username в AuthProvider
+              authProvider.setUsername(value); 
             },
           ),
-          // Поле для ввода email
           RoundedInputField(
             hintText: 'Email',
             icon: Icons.mail,
             onChanged: (value) {
-              authProvider.setEmail(value); // Сохраняем email в AuthProvider
+              authProvider.setEmail(value);
             },
           ),
-          // Поле для ввода пароля
           RoundedPasswordField(
             onChanged: (value) {
-              authProvider.setPassword(value); // Сохраняем пароль в AuthProvider
+              authProvider.setPassword(value);
             },
           ),
-          // Отображение сообщения об ошибке валидации пароля
           if (authProvider.validateMessage != null)
             Text(
               authProvider.validateMessage!,
               style: const TextStyle(color: Colors.red),
             ),
-          // Кнопка для регистрации
           RoundedButton(
             text: authProvider.isLoading ? 'LOADING...' : 'REGISTER',
             color: const Color.fromARGB(180, 4, 221, 236),
             press: authProvider.isLoading ? null : () async {
               bool success = await authProvider.signUp();
 
+              // ignore: use_build_context_synchronously
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(success ? 'Регистрация прошла успешно' : authProvider.errorMessage ?? 'Ошибка')),
               );
 
               if (success) {
-                authProvider.clearError(); // Сброс ошибок перед переходом
+                authProvider.clearError(); 
                 Navigator.push(
+                  // ignore: use_build_context_synchronously
                   context,
                   MaterialPageRoute(
                     builder: (context) {
@@ -92,7 +80,7 @@ class Body extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return LoginScreen();
+                    return const LoginScreen();
                   },
                 ),
               );

@@ -4,11 +4,12 @@ import 'package:flut1/components/text_field_container.dart';
 class RoundedPasswordField extends StatefulWidget {
   final ValueChanged<String> onChanged;
   const RoundedPasswordField({
-    Key? key,
+    super.key,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
+  // ignore: library_private_types_in_public_api
   _RoundedPasswordFieldState createState() => _RoundedPasswordFieldState();
 }
 

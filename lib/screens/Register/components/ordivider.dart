@@ -30,7 +30,7 @@ class OrDivider extends StatelessWidget {
   }
 
   Expanded buildDivider() {
-    return Expanded(
+    return const Expanded(
       child: Divider(
         color: Color(0xFFD9D9D9),
         height: 1.5,

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 class Background extends StatelessWidget {
   final Widget child;
   const Background({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
   
   @override
   Widget build(BuildContext context) {
@@ -16,14 +16,12 @@ class Background extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // SVG картинка для заднего фона
           Positioned.fill(
             child: Image.asset(
               'assets/background/welcome.jpg',
               fit: BoxFit.cover,
             ),
           ),
-          // Дочерний элемент (контент)
           child,
         ],
       ),

@@ -6,10 +6,10 @@ class AlreadyHAACheck extends StatelessWidget {
   final VoidCallback press;
   const AlreadyHAACheck({
 
-    Key? key,
+    super.key,
     this.login = true,
     required this.press,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
