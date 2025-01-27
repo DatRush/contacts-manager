@@ -1,54 +1,27 @@
+import 'package:flut1/screens/Main/mainpage.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRScanPage extends StatefulWidget {
-  const QRScanPage ({super.key});
-
   @override
   State<StatefulWidget> createState() => _QRScanPageState();
 }
 
 class _QRScanPageState extends State<QRScanPage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  Barcode? result;
   QRViewController? controller;
-
-  @override
-  void reassemble() {
-    super.reassemble();
-    controller?.pauseCamera();
-    controller?.resumeCamera();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Сканер QR-кодов'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Сканировать QR-код')),
       body: Column(
-        children: <Widget>[
+        children: [
           Expanded(
             flex: 5,
             child: QRView(
               key: qrKey,
               onQRViewCreated: _onQRViewCreated,
-              overlay: QrScannerOverlayShape(
-                borderColor: Colors.blue,
-                borderRadius: 10,
-                borderLength: 30,
-                borderWidth: 10,
-                cutOutSize: 300, // Размер области для сканирования
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Center(
-              child: (result != null)
-                  ? Text('Результат: ${result!.code}')
-                  : const Text('Отсканируйте QR-код'),
             ),
           ),
         ],
@@ -57,13 +30,29 @@ class _QRScanPageState extends State<QRScanPage> {
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    setState(() {
-      this.controller = controller;
-    });
+    this.controller = controller;
+
     controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
+      // Извлекаем ID карточки из QR-кода
+      final String scannedData = scanData.code ?? '';
+
+      // Преобразуем в int
+      final int? cardId = int.tryParse(scannedData);
+
+      if (cardId != null) {
+        // Если удалось преобразовать в ID, переходим на экран карточки
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyHomePage(scannedCardId: cardId),
+          ),
+        );
+      } else {
+        // Если данные некорректны, показываем ошибку
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Неверный QR-код')),
+        );
+      }
     });
   }
 
@@ -73,3 +62,4 @@ class _QRScanPageState extends State<QRScanPage> {
     super.dispose();
   }
 }
+

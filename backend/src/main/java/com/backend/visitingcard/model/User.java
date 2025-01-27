@@ -2,8 +2,6 @@ package com.backend.visitingcard.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.util.Set;
-
 
 @Data
 @Entity
@@ -23,9 +21,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    //Пользователь может иметь несколько карточек
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Card> cards;
+    // Связь One-to-One с карточкой
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Card card;
 }
-
-

@@ -14,7 +14,6 @@ class Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthModel>(context); 
     Size size = MediaQuery.of(context).size;
-
     return Background(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -1,31 +1,45 @@
-import 'package:flutter/material.dart';
-import 'dart:typed_data';
+import 'package:flut1/imports.dart';
 
 class ContactModel with ChangeNotifier {
-  final List<Map<String, String>> _contacts = [];
-  Uint8List? _imageBytes;
+  final List<ContactData> _contacts = []; // Используем модель ContactData
+  final ApiService apiService;
 
-  // Геттер для контактов
-  List<Map<String, String>> get contacts => _contacts;
+  ContactModel(this.apiService);
 
-  // Геттер для изображения
-  Uint8List? get imageBytes => _imageBytes;
+  // Геттер для списка контактов
+  List<ContactData> get contacts => _contacts;
+
+  // Метод для загрузки контактов из API
+  Future<void> fetchContacts(int cardId) async {
+    try {
+      final response = await apiService.fetchContacts(cardId);
+      _contacts.clear();
+      _contacts.addAll(response.map((data) => ContactData.fromJson(data)).toList());
+      notifyListeners();
+    } catch (e) {
+      print('Ошибка загрузки контактов: $e');
+    }
+  }
 
   // Метод для добавления контакта
-  void addContact(String type, String value, String info) {
-    _contacts.add({'type': type, 'value': value, 'info': info});
-    notifyListeners(); // Уведомляем виджеты об изменении состояния
+  Future<void> addContact(int cardId, String type, String value, String info) async {
+    final contactData = {'type': type, 'value': value, 'info': info};
+
+    // Отправляем данные на сервер и получаем добавленный контакт
+    final savedContact = await apiService.addContact(cardId, contactData);
+
+    // Если успешно, добавляем локально
+    _contacts.add(ContactData.fromJson(savedContact));
+    notifyListeners();
   }
 
   // Метод для удаления контакта
-  void removeContact(int index) {
-    _contacts.removeAt(index);
-    notifyListeners(); // Уведомляем виджеты об изменении состояния
-  }
+  Future<void> removeContact(int contactId) async {
+    // Удаляем контакт на сервере
+    await apiService.deleteContact(contactId);
 
-  // Метод для обновления изображения
-  void updateImage(Uint8List bytes) {
-    _imageBytes = bytes;
+    // Удаляем контакт локально
+    _contacts.removeWhere((contact) => contact.id == contactId);
     notifyListeners();
   }
 }

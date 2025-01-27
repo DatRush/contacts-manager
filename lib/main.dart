@@ -5,10 +5,13 @@ import 'package:flut1/imports.dart';
 
 void main() {
   runApp(
-    MultiProvider( 
+    MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ContactModel()),
-        ChangeNotifierProvider(create: (_) => AuthModel()), 
+        Provider(create: (_) => ApiService('http://10.202.1.10:9090/api')),
+        ChangeNotifierProvider(
+          create: (context) => ContactModel(context.read<ApiService>()),
+        ),
+        ChangeNotifierProvider(create: (_) => AuthModel()),
       ],
       child: const MyApp(),
     ),
@@ -20,6 +23,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("test1");
     return MaterialApp(
       title: 'Test01',
       debugShowCheckedModeBanner: false,
@@ -27,7 +31,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF121212),
         primaryColor: const Color(0xFF1A1A40),
 
-        cardColor: const Color(0xFF23232E), 
+        cardColor: const Color(0xFF23232E),
 
         textTheme: const TextTheme(
           bodyLarge: TextStyle(
@@ -56,20 +60,20 @@ class MyApp extends StatelessWidget {
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color(0xFF607D8B),
           foregroundColor: Colors.white,
-          elevation: 6.0, 
+          elevation: 6.0,
         ),
 
         inputDecorationTheme: const InputDecorationTheme(
           filled: true,
-          fillColor: Color(0xFF23232E), 
+          fillColor: Color(0xFF23232E),
           labelStyle: TextStyle(
             color: Color(0xFFFFC107),
           ),
           border: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFFF5722)), 
+            borderSide: BorderSide(color: Color(0xFFFF5722)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFFFC107)), 
+            borderSide: BorderSide(color: Color(0xFFFFC107)),
           ),
         ),
 
@@ -83,6 +87,4 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
-
 }

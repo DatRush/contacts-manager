@@ -42,33 +42,10 @@ class Body extends StatelessWidget {
               authProvider.setPassword(value);
             },
           ),
-          RoundedButton(
-            text: 'LOGIN',
-            color: const Color.fromARGB(180, 4, 221, 236),
-            press: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return const MyHomePage();
-                    },
-                  ),
-                );
-            },
-          ),
-          // Кнопка для входа
           // RoundedButton(
-          //   text: authProvider.isLoading ? 'LOADING...' : 'LOGIN',
+          //   text: 'LOGIN',
           //   color: const Color.fromARGB(180, 4, 221, 236),
-          //   press: authProvider.isLoading ? null : () async {
-          //     bool success = await authProvider.login();
-
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //       SnackBar(content: Text(success ? 'Вход прошел успешно' : authProvider.errorMessage ?? 'Ошибка')),
-          //     );
-
-          //     if (success) {
-          //       authProvider.clearError(); // Сброс ошибок перед переходом
+          //   press: () {
           //       Navigator.push(
           //         context,
           //         MaterialPageRoute(
@@ -77,9 +54,32 @@ class Body extends StatelessWidget {
           //           },
           //         ),
           //       );
-          //     }
           //   },
           // ),
+          // Кнопка для входа
+          RoundedButton(
+            text: authProvider.isLoading ? 'LOADING...' : 'LOGIN',
+            color: const Color.fromARGB(180, 4, 221, 236),
+            press: authProvider.isLoading ? null : () async {
+              bool success = await authProvider.login();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(success ? 'Вход прошел успешно' : authProvider.errorMessage ?? 'Ошибка')),
+              );
+
+              if (success) {
+                authProvider.clearError(); // Сброс ошибок перед переходом
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const MyHomePage();
+                    },
+                  ),
+                );
+              }
+            },
+          ),
           SizedBox(
             height: size.height * 0.03,
           ),

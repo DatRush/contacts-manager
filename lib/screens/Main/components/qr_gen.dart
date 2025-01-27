@@ -2,22 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QRCodePage extends StatelessWidget {
-  const QRCodePage({super.key});
+  final int cardId; // ID визитки
+
+  const QRCodePage({super.key, required this.cardId});
 
   @override
   Widget build(BuildContext context) {
-    const String homepageUrl = 'http://localhost:64785/'; 
-
     return Scaffold(
-      appBar: AppBar(title: const Text('QR-код для главной страницы')),
+      appBar: AppBar(title: const Text('QR-код визитки')),
       body: Center(
-        child: QrImageView(
-          data: homepageUrl, 
-          version: QrVersions.auto,
-          size: 200.0,
-          backgroundColor: Colors.white, 
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            QrImageView(
+              data: cardId.toString(), // Зашиваем только ID в QR-код
+              version: QrVersions.auto,
+              size: 200.0,
+              backgroundColor: Colors.white,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Отсканируйте QR-код, чтобы открыть визитку',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
   }
 }
+

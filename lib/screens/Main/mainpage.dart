@@ -1,26 +1,78 @@
 import 'package:flut1/imports.dart';
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
+  final int? scannedCardId; // ID карточки, полученный через QR-код
+
+  const MyHomePage({super.key, this.scannedCardId});
 
   @override
   Widget build(BuildContext context) {
+    final apiService = context.read<ApiService>();
+    final currentUserId = context.read<AuthModel>().userId;
+
+    return FutureBuilder(
+      future: apiService.fetchCards(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Ошибка: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          final cardDataList = snapshot.data as List<CardData>;
+
+          if (cardDataList.isEmpty) {
+            return const Center(child: Text('Нет данных'));
+          }
+
+          // Если есть ID карточки из QR-кода, используем его
+          final cardData = scannedCardId != null
+              ? cardDataList.firstWhere(
+                  (card) => card.id == scannedCardId,
+                )
+              : cardDataList.firstWhere(
+                  (card) => card.id == currentUserId,
+                );
+
+          final isOwner = currentUserId == cardData.id;
+
+          return MyHomePageContent(cardData: cardData, isOwner: isOwner);
+        } else {
+          return const Center(child: Text('Нет данных'));
+        }
+      },
+    );
+  }
+}
+
+
+class MyHomePageContent extends StatelessWidget {
+  final CardData cardData;
+  final bool isOwner;
+  const MyHomePageContent(
+      {required this.cardData, required this.isOwner, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final contactModel = context.read<ContactModel>();
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 600) {
             // Широкий экран: два столбца
-            return const Row(
+            return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   flex: 1,
-                  child: ProfileWidget(),
+                  child: ProfileWidget(cardData: cardData, isOwner: isOwner),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Expanded(
                   flex: 2,
-                  child: LinkPanelWidget(),
+                  child: LinkPanelWidget(
+                      contactModel: contactModel,
+                      cardData: cardData,
+                      isOwner: isOwner),
                 ),
               ],
             );
@@ -28,14 +80,16 @@ class MyHomePage extends StatelessWidget {
             // Узкий экран: только левый столбец и кнопка для открытия боковой панели
             return Stack(
               children: [
-                const ProfileWidget(),
+                ProfileWidget(cardData: cardData, isOwner: isOwner),
                 Positioned(
                   top: 48,
                   right: 16,
-                  child: IconButton(
-                    icon: const Icon(Icons.chrome_reader_mode),
-                    tooltip: 'Открыть меню',
-                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                  child: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.chrome_reader_mode, size: 30),
+                      tooltip: 'Открыть меню',
+                      onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    ),
                   ),
                 ),
               ],
@@ -46,12 +100,15 @@ class MyHomePage extends StatelessWidget {
       endDrawer: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth <= 600) {
-            return const Drawer(
-              child: LinkPanelWidget(),
+            return Drawer(
+              child: LinkPanelWidget(
+                contactModel: contactModel,
+                cardData: cardData,
+                isOwner: isOwner,
+              ),
             );
           }
-          return const SizedBox
-              .shrink();
+          return const SizedBox.shrink();
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -72,7 +129,7 @@ class MyHomePage extends StatelessWidget {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  const QRScanPage(),
+                                  QRScanPage(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             const begin = Offset(1.0, 0.0);
@@ -100,7 +157,7 @@ class MyHomePage extends StatelessWidget {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  const QRCodePage(),
+                                  QRCodePage(cardId: cardData.id),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             const begin = Offset(1.0, 0.0);

@@ -17,3 +17,5 @@ export 'package:url_launcher/url_launcher.dart';
 export 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'package:image_picker/image_picker.dart';
 export 'package:flutter_svg/svg.dart';
+export '../services/api_service.dart';
+export 'package:flut1/classes/card_data.dart';
