@@ -1,4 +1,9 @@
-import 'package:flut1/imports.dart';
+import 'package:flut1/screens/Main/components/profile.dart';
+import 'package:flutter/material.dart';
+import 'package:flut1/screens/Main/components/qr_gen.dart';
+
+import 'components/linkpanel.dart';
+import 'components/qr_scan.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
@@ -9,23 +14,15 @@ class MyHomePage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 600) {
-            // Широкий экран: два столбца
             return const Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  flex: 1,
-                  child: ProfileWidget(),
-                ),
+                Expanded(flex: 1, child: ProfileWidget()),
                 SizedBox(width: 16),
-                Expanded(
-                  flex: 2,
-                  child: LinkPanelWidget(),
-                ),
+                Expanded(flex: 2, child: LinkPanelWidget()),
               ],
             );
           } else {
-            // Узкий экран: только левый столбец и кнопка для открытия боковой панели
             return Stack(
               children: [
                 const ProfileWidget(),
@@ -46,12 +43,9 @@ class MyHomePage extends StatelessWidget {
       endDrawer: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth <= 600) {
-            return const Drawer(
-              child: LinkPanelWidget(),
-            );
+            return const Drawer(child: LinkPanelWidget());
           }
-          return const SizedBox
-              .shrink();
+          return const SizedBox.shrink();
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -67,26 +61,11 @@ class MyHomePage extends StatelessWidget {
                     title: const Text('Сканировать QR-код'),
                     onTap: () {
                       Navigator.pop(context);
+                      // Навигация на экран сканирования QR-кода
                       Navigator.push(
                         context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  const QRScanPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(1.0, 0.0);
-                            const end = Offset.zero;
-                            const curve = Curves.ease;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                                position: offsetAnimation, child: child);
-                          },
-                        ),
+                        MaterialPageRoute(
+                            builder: (context) => const QRScanPage()),
                       );
                     },
                   ),
@@ -95,25 +74,12 @@ class MyHomePage extends StatelessWidget {
                     title: const Text('Сгенерировать QR-код'),
                     onTap: () {
                       Navigator.pop(context);
+                      // Передача userId и переход на страницу генерации QR-кода
+                      String userId = 'user123';
                       Navigator.push(
                         context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  const QRCodePage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(1.0, 0.0);
-                            const end = Offset.zero;
-                            const curve = Curves.ease;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                                position: offsetAnimation, child: child);
-                          },
+                        MaterialPageRoute(
+                          builder: (context) => QRCodePage(userId: userId),
                         ),
                       );
                     },

@@ -1,93 +1,138 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+ <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+ <parent>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-parent</artifactId>
+  <version>3.3.4</version>
+  <relativePath /> <!-- lookup parent from repository -->
+ </parent>
 
-	<groupId>com.backend</groupId>
-	<artifactId>backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>backend</name>
-	<description>Backend for project</description>
+ <groupId>com.backend</groupId>
+ <artifactId>backend</artifactId>
+ <version>0.0.1-SNAPSHOT</version>
+ <name>backend</name>
+ <description>Backend for project</description>
 
-	<properties>
-		<java.version>17</java.version>
-	</properties>
+ <properties>
+  <java.version>17</java.version>
+ </properties>
 
-	<dependencies>
-		<!-- Lombok для удобства работы с моделями -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.30</version>
-			<scope>provided</scope>
-		</dependency>
+ <repositories>
+  <repository>
+   <id>jitpack.io</id>
+   <url>https://jitpack.io</url>
+  </repository>
+  <repository>
+   <id>central</id>
+   <url>https://repo.maven.apache.org/maven2</url>
+  </repository>
+ </repositories>
 
-		<!-- JPA для работы с базой данных -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
+ <dependencies>
+  <!-- Lombok для удобства работы с моделями -->
+  <dependency>
+   <groupId>org.projectlombok</groupId>
+   <artifactId>lombok</artifactId>
+   <version>1.18.30</version>
+   <scope>provided</scope>
+  </dependency>
 
-		<!-- Веб-модуль -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
+  <!-- JPA для работы с базой данных -->
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-data-jpa</artifactId>
+  </dependency>
 
-		<!-- Безопасность с Spring Security -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-crypto</artifactId>
-		</dependency>
+  <!-- Веб-модуль -->
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
 
-		<!-- Поддержка Postgres -->
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+  <!-- Безопасность с Spring Security -->
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-security</artifactId>
+  </dependency>
+  <dependency>
+   <groupId>org.springframework.security</groupId>
+   <artifactId>spring-security-config</artifactId>
+  </dependency>
+  <dependency>
+   <groupId>org.springframework.security</groupId>
+   <artifactId>spring-security-web</artifactId>
+  </dependency>
+  <dependency>
+   <groupId>org.springframework.security</groupId>
+   <artifactId>spring-security-crypto</artifactId>
+  </dependency>
 
-		<!-- DevTools для горячей перезагрузки -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
+  <!-- JWT -->
+  <!-- Основной API для работы с JWT -->
+  <dependency>
+   <groupId>io.jsonwebtoken</groupId>
+   <artifactId>jjwt-api</artifactId>
+   <version>0.11.5</version>
+  </dependency>
 
-		<!-- Тестирование -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+  <!-- Реализация API -->
+  <dependency>
+   <groupId>io.jsonwebtoken</groupId>
+   <artifactId>jjwt-impl</artifactId>
+   <version>0.11.5</version>
+  </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+  <!-- Для работы с JSON (используется Jackson) -->
+  <dependency>
+   <groupId>io.jsonwebtoken</groupId>
+   <artifactId>jjwt-jackson</artifactId>
+   <version>0.11.5</version>
+  </dependency>
+
+  <!-- ZXing (Zebra Crossing) -->
+  <dependency>
+   <groupId>com.google.zxing</groupId>
+   <artifactId>core</artifactId>
+   <version>3.5.1</version>
+  </dependency>
+  <dependency>
+   <groupId>com.google.zxing</groupId>
+   <artifactId>javase</artifactId>
+   <version>3.5.1</version>
+  </dependency>
+
+  <!-- Поддержка Postgres -->
+  <dependency>
+   <groupId>org.postgresql</groupId>
+   <artifactId>postgresql</artifactId>
+   <scope>runtime</scope>
+  </dependency>
+
+  <!-- DevTools для горячей перезагрузки -->
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-devtools</artifactId>
+   <scope>runtime</scope>
+   <optional>true</optional>
+  </dependency>
+
+  <!-- Тестирование -->
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-test</artifactId>
+   <scope>test</scope>
+  </dependency>
+ </dependencies>
+
+ <build>
+  <plugins>
+   <plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+   </plugin>
+  </plugins>
+ </build>
 </project>
