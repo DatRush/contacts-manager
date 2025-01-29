@@ -22,7 +22,7 @@ class AuthModel with ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get validateMessage => _validateMessage;
 
-  final ApiService apiService = ApiService('http://10.202.1.10:9090/api');
+  final ApiService apiService = ApiService('http://192.168.1.85:8080/api');
   Uint8List? _imageBytes;
   // Регулярное выражение для email и пароля
   RegExp emailRegex =
@@ -129,8 +129,6 @@ class AuthModel with ChangeNotifier {
       _password,
       _email,
     );
-
-    print("completed");
 
     if (success) {
       _username = '';

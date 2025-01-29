@@ -59,10 +59,23 @@ class ApiService {
   Future<bool> registerUser(
       String username, String password, String email) async {
     final body = {'username': username, 'password': password, 'email': email};
-    print("checking");
-    await _post('/users/register', body);
-    print("completed");
-    return true; // Если дошли сюда, запрос успешен
+
+    // Отправляем запрос на регистрацию пользователя
+    final userData = await _post('/users/register', body);
+
+    print('User Data: $userData'); // Логируем ответ сервера
+    final userId = userData['id'];
+    if (userId == null) {
+      throw Exception('User ID is null. Check API response.');
+    }
+
+    try {
+      await createCard(userId);
+    } catch (e) {
+      print('Error creating card: $e');
+      throw Exception('Failed to create card.');
+    }
+    return true; // Если все шаги выполнены успешно
   }
 
   // Авторизация пользователя
@@ -74,32 +87,47 @@ class ApiService {
 
   // Получение всех визиток
   Future<List<CardData>> fetchCards() async {
-    final data = await _get('/api/cards');
-    return (data as List).map((card) => CardData.fromJson(card)).toList();
+    try {
+      final data = await _get('/cards');
+      if (data == null || data.isEmpty) {
+        return []; // Возвращаем пустой список, если нет данных
+      }
+      return (data as List).map((card) => CardData.fromJson(card)).toList();
+    } catch (e) {
+      throw Exception('Ошибка при загрузке карточек: $e');
+    }
   }
 
   // Получение визитки по ID
   Future<CardData> fetchCardById(int id) async {
-    final data = await _get('/api/cards/$id');
+    final data = await _get('/cards/$id');
     return CardData.fromJson(data);
   }
 
-  // Создание визитки
-  Future<int> createCard(String ownerName, String cardTitle) async {
-    final body = {'owner': ownerName, 'title': cardTitle};
-    final data = await _post('/api/cards/', body);
-    return data['id']; // Возвращаем ID карточки
-  }
+Future<int> createCard(int userId) async {
+  final body = {
+    'name': '',
+    'description': '',
+    'company_name': '',
+    'company_address': '',
+    'position': '',
+    'user_id': userId, // <-- добавляем
+    'avatar_url': '',
+  };
+
+  final data = await _post('/cards', body);
+  return data['id']; 
+}
 
   // Обновление визитки
   Future<CardData> updateCard(int id, CardData updatedCard) async {
-    final data = await _put('/api/cards/$id', updatedCard.toJson());
+    final data = await _put('/cards/$id', updatedCard.toJson());
     return CardData.fromJson(data);
   }
 
   // Удаление визитки
   Future<void> deleteCard(int id) async {
-    await _delete('/api/cards/$id');
+    await _delete(' /cards/$id');
   }
 
   // Добавление нового контакта

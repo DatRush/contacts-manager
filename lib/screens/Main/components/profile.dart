@@ -13,13 +13,13 @@ class ProfileWidget extends StatefulWidget {
 
 class _ProfileWidgetState extends State<ProfileWidget> {
   late TextEditingController nameController = TextEditingController();
-  late TextEditingController bioController = TextEditingController();
+  late TextEditingController descriptionController = TextEditingController();
   late TextEditingController positionController = TextEditingController();
   late TextEditingController companyNameController = TextEditingController();
-  late TextEditingController addressController = TextEditingController();
+  late TextEditingController companyaddressController = TextEditingController();
   late TextEditingController ownerController = TextEditingController();
 
-  final apiService = ApiService('http://10.202.1.10:9090/api');
+  final apiService = ApiService('http://192.168.1.85:8080/api');
 
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode positionFocusNode = FocusNode();
@@ -38,11 +38,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     companyNameFocusNode.addListener(_handleCompanyFocusChange);
     ownerFocusNode.addListener(_handleCompanyFocusChange);
     nameController = TextEditingController(text: widget.cardData.name);
-    bioController = TextEditingController(text: widget.cardData.bio);
+    descriptionController = TextEditingController(text: widget.cardData.description);
     positionController = TextEditingController(text: widget.cardData.position);
     companyNameController =
-        TextEditingController(text: widget.cardData.companyName);
-    addressController = TextEditingController(text: widget.cardData.address);
+        TextEditingController(text: widget.cardData.company_name);
+    companyaddressController = TextEditingController(text: widget.cardData.company_address);
   }
 
   void _handleFocusChange() {
@@ -60,10 +60,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   @override
   void dispose() {
     nameController.dispose();
-    bioController.dispose();
+    descriptionController.dispose();
     positionController.dispose();
     companyNameController.dispose();
-    addressController.dispose();
+    companyaddressController.dispose();
     ownerController.dispose();
     nameFocusNode.dispose();
     positionFocusNode.dispose();
@@ -88,11 +88,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     final updatedCard = CardData(
       id: widget.cardData.id,
       name: nameController.text,
-      bio: bioController.text,
+      description: descriptionController.text,
       position: positionController.text,
-      companyName: companyNameController.text,
-      address: addressController.text,
-      contacts: widget.cardData.contacts,
+      company_name: companyNameController.text,
+      company_address: companyaddressController.text,
+      user_id: widget.cardData.user_id,
+      avatar_url: '',
     );
 
     try {
@@ -202,7 +203,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         ),
         const SizedBox(height: 16),
         TextField(
-          controller: bioController,
+          controller: descriptionController,
           maxLines: 2,
           enabled: widget.isOwner,
           decoration: const InputDecoration(
@@ -258,7 +259,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
         ),
         TextField(
-          controller: addressController,
+          controller: companyaddressController,
           enabled: widget.isOwner,
           decoration: const InputDecoration(
             hintText: 'Введите адрес',

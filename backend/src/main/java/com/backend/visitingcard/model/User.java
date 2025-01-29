@@ -21,7 +21,4 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // Связь One-to-One с карточкой
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Card card;
 }

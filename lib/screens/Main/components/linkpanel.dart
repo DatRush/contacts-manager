@@ -179,9 +179,9 @@ class _LinkPanelWidgetState extends State<LinkPanelWidget> {
                           child: ListTile(
                             title: InkWell(
                               onTap: () => _launchContact(
-                                  contact.type, contact.value),
+                                  contact.name, contact.url),
                               child: Text(
-                                contact.info,
+                                contact.description,
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w500,
@@ -199,7 +199,7 @@ class _LinkPanelWidgetState extends State<LinkPanelWidget> {
                               alignment: Alignment.center,
                               child: Icon(
                                 _getIconForContact(
-                                    contact.type, contact.value),
+                                    contact.name, contact.url),
                                 size: 40,
                               ),
                             ),

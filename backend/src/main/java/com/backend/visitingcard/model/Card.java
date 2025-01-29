@@ -2,8 +2,8 @@ package com.backend.visitingcard.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -13,28 +13,34 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String name;
 
+    @Column(nullable = true)
     private String description;
 
-    @Column(nullable = false)
-    private String companyName;
+    @Column(nullable = true)
+    private String company_name;
 
-    private String companyAddress;
+    @Column(nullable = true)
+    private String company_address;
 
+    @Column(nullable = true)
     private String position;
 
-    // Связь One-to-One с пользователем
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime created_at = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Contact> contacts;
+    @Column(nullable = false)
+    private String avatar_url;
 
-    private String avatarUrl;
+    public void setUserId(Long userId) {
+        this.user = new User();
+        this.user.setId(userId);
+    }
+
 }

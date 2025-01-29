@@ -7,7 +7,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        Provider(create: (_) => ApiService('http://10.202.1.10:9090/api')),
+        Provider(create: (_) => ApiService('http://192.168.1.85:8080/api')),
         ChangeNotifierProvider(
           create: (context) => ContactModel(context.read<ApiService>()),
         ),
@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("test1");
     return MaterialApp(
       title: 'Test01',
       debugShowCheckedModeBanner: false,
