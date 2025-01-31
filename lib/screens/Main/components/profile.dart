@@ -19,7 +19,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   late TextEditingController companyaddressController = TextEditingController();
   late TextEditingController ownerController = TextEditingController();
 
-  final apiService = ApiService('http://192.168.1.85:8080/api');
+  final apiService = ApiService('http://10.201.5.216:8080/api');
 
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode positionFocusNode = FocusNode();

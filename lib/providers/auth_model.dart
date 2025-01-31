@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flut1/services/api_service.dart';
 
@@ -9,7 +8,8 @@ class AuthModel with ChangeNotifier {
   String _email = '';
   String _password = '';
   String _username = '';
-  int? _userId; 
+  int? _userId;
+  int? _cardId; // Добавили хранение cardId
   bool _isLoading = false;
   String? _errorMessage;
   String? _validateMessage;
@@ -17,25 +17,25 @@ class AuthModel with ChangeNotifier {
   String get email => _email;
   String get password => _password;
   String get username => _username;
-  int? get userId => _userId; 
+  int? get userId => _userId;
+  int? get cardId => _cardId; // Геттер для cardId
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get validateMessage => _validateMessage;
 
-  final ApiService apiService = ApiService('http://192.168.1.85:8080/api');
+  final ApiService apiService = ApiService('http://10.201.5.216:8080/api');
   Uint8List? _imageBytes;
-  // Регулярное выражение для email и пароля
+
   RegExp emailRegex =
       RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
   RegExp passwordRegex =
       RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$');
 
-  // Новое поле для роли пользователя
-  UserRole _role = UserRole.owner; // По умолчанию роль владельца
+  UserRole _role = UserRole.owner;
 
   UserRole get role => _role;
   Uint8List? get imageBytes => _imageBytes;
-  // Метод для установки роли
+
   void setRole(UserRole role) {
     _role = role;
     notifyListeners();
@@ -49,47 +49,39 @@ class AuthModel with ChangeNotifier {
     _userId = userId;
     notifyListeners();
   }
-  // Установка email с проверкой
+
+  void setCardId(int cardId) {
+    _cardId = cardId;
+    notifyListeners();
+  }
+
   void setEmail(String email) {
     _email = email;
-    if (!emailRegex.hasMatch(email)) {
-      _errorMessage = 'Некорректный формат email';
-    } else {
-      _errorMessage = null;
-    }
+    _errorMessage = emailRegex.hasMatch(email) ? null : 'Некорректный формат email';
     notifyListeners();
   }
 
-  // Установка пароля с проверкой
   void setPassword(String password) {
     _password = password;
-    _errorMessage = passwordRegex.hasMatch(password)
-        ? null
-        : 'Условие пароля: длина 8, цифра, спец. символ';
+    _errorMessage = passwordRegex.hasMatch(password) ? null : 'Пароль должен содержать 8 символов, цифру и спецсимвол';
     notifyListeners();
   }
 
-  // Установка имени пользователя
   void setUsername(String username) {
     _username = username;
     notifyListeners();
   }
 
-  // Логин
+  // Логин с обработкой user_id и card_id
   Future<bool> login() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    bool success = await apiService.loginUser(
-      _username,
-      _password,
-    );
+    bool success = await apiService.loginUser(_username, _password);
 
     if (success) {
       setRole(UserRole.owner);
-      _username = '';
-      _password = '';
       notifyListeners();
     } else {
       _errorMessage = 'Неверные учетные данные';
@@ -100,42 +92,15 @@ class AuthModel with ChangeNotifier {
     return success;
   }
 
-  // Регистрация
+  // Регистрация без лишних проверок
   Future<bool> signUp() async {
     _isLoading = true;
     _errorMessage = null;
-    if (!emailRegex.hasMatch(_email)) {
-      _errorMessage = 'Некорректный формат email';
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-
-    if (!passwordRegex.hasMatch(_password)) {
-      _errorMessage = 'Условие пароля: длина 8, цифра, спец. символ';
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
     notifyListeners();
 
-    if (_errorMessage != null) {
-      _isLoading = false;
-      return false;
-    }
+    bool success = await apiService.registerUser(_username, _password, _email);
 
-    bool success = await apiService.registerUser(
-      _username,
-      _password,
-      _email,
-    );
-
-    if (success) {
-      _username = '';
-      _password = '';
-      _email = '';
-      notifyListeners();
-    } else {
+    if (!success) {
       _errorMessage = 'Ошибка регистрации';
     }
 
@@ -144,15 +109,14 @@ class AuthModel with ChangeNotifier {
     return success;
   }
 
-  // Сброс ошибок
   void clearError() {
     _errorMessage = null;
     notifyListeners();
   }
 
-    // Метод для обновления изображения
   void updateImage(Uint8List bytes) {
     _imageBytes = bytes;
     notifyListeners();
   }
 }
+

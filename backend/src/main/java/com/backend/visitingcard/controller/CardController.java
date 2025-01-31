@@ -66,6 +66,8 @@ public class CardController {
         if (card == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Карточка не найдена.");
         }
+        System.out.println("🔹 Поиск карточки с ID: " + id);
+
         return new ResponseEntity<>(card, HttpStatus.OK);
     }
 

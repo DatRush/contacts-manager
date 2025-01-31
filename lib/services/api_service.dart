@@ -63,32 +63,35 @@ class ApiService {
     // Отправляем запрос на регистрацию пользователя
     final userData = await _post('/users/register', body);
 
-    print('User Data: $userData'); // Логируем ответ сервера
-    final userId = userData['id'];
-    if (userId == null) {
-      throw Exception('User ID is null. Check API response.');
+    if (userData == null ||
+        !userData.containsKey('user_id') ||
+        !userData.containsKey('card_id')) {
+      throw Exception(
+          'Ошибка: user_id или card_id отсутствует в ответе сервера');
     }
 
-    try {
-      await createCard(userId);
-    } catch (e) {
-      print('Error creating card: $e');
-      throw Exception('Failed to create card.');
-    }
-    return true; // Если все шаги выполнены успешно
+    return true;
   }
 
   // Авторизация пользователя
-  Future<bool> loginUser(String username, String password) async {
-    final body = {'username': username, 'password': password};
-    await _post('/users/login', body);
-    return true;
+Future<bool> loginUser(String username, String password) async {
+  final body = {'username': username, 'password': password};
+
+  final userData = await _post('/users/login', body);
+
+  if (userData == null || !userData.containsKey('user_id')) {
+    throw Exception('Ошибка: user_id отсутствует в ответе сервера');
   }
+
+  return true; // Теперь Flutter получает user_id и card_id
+}
+
 
   // Получение всех визиток
   Future<List<CardData>> fetchCards() async {
     try {
       final data = await _get('/cards');
+      
       if (data == null || data.isEmpty) {
         return []; // Возвращаем пустой список, если нет данных
       }
@@ -99,25 +102,20 @@ class ApiService {
   }
 
   // Получение визитки по ID
-  Future<CardData> fetchCardById(int id) async {
-    final data = await _get('/cards/$id');
+Future<CardData?> fetchCardById(int userId) async {
+  try {
+    final data = await _get('/cards/$userId');
+    if (data == null) {
+      print('❌ Карточка не найдена для userId: $userId');
+      return null; // Вернем null вместо ошибки
+    }
     return CardData.fromJson(data);
+  } catch (e) {
+    print('❌ Ошибка при получении карточки: $e');
+    return null;
   }
-
-Future<int> createCard(int userId) async {
-  final body = {
-    'name': '',
-    'description': '',
-    'company_name': '',
-    'company_address': '',
-    'position': '',
-    'user_id': userId, // <-- добавляем
-    'avatar_url': '',
-  };
-
-  final data = await _post('/cards', body);
-  return data['id']; 
 }
+
 
   // Обновление визитки
   Future<CardData> updateCard(int id, CardData updatedCard) async {

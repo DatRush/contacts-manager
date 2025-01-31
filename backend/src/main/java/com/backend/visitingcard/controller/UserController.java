@@ -1,12 +1,17 @@
 package com.backend.visitingcard.controller;
 
+import com.backend.visitingcard.model.Card;
 import com.backend.visitingcard.model.User;
+import com.backend.visitingcard.repository.CardRepository;
+import com.backend.visitingcard.repository.UserRepository;
 import com.backend.visitingcard.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +22,12 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    CardRepository cardRepository;
 
     // Получение всех пользователей
     @GetMapping
@@ -30,31 +41,41 @@ public class UserController {
 
     // Создание нового пользователя
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
-        if (user.getUsername() == null || user.getUsername().isEmpty()) {
-            return ResponseEntity.badRequest().body("Имя пользователя не может быть пустым.");
-        }
-        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            return ResponseEntity.badRequest().body("Пароль не может быть пустым.");
-        }
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            return ResponseEntity.badRequest().body("Email не может быть пустым.");
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> userData) {
+        String username = userData.get("username");
+        String email = userData.get("email");
+        String password = userData.get("password");
+
+        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь уже существует.");
         }
 
-        if (userService.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Этот email уже используется.");
-        }
-        if (userService.existsByUsername(user.getUsername())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Это имя пользователя уже занято.");
-        }
+        // Создаём пользователя
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setEmail(email);
 
-        try {
-            User newUser = userService.createUser(user);
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Ошибка при создании пользователя.");
-        }
+        newUser.setPassword(passwordEncoder.encode(password));
+        newUser = userRepository.save(newUser);
+
+        // Создаём карточку сразу
+        Card newCard = new Card();
+        newCard.setUser(newUser); // Привязываем пользователя
+        newCard.setName(""); // Оставляем пустые поля
+        newCard.setDescription("");
+        newCard.setCompany_name("");
+        newCard.setCompany_address("");
+        newCard.setPosition("");
+        newCard.setAvatar_url("");
+
+        newCard = cardRepository.save(newCard);
+
+        // Возвращаем user_id и card_id в ответе
+        Map<String, Object> response = new HashMap<>();
+        response.put("user_id", newUser.getId());
+        response.put("card_id", newCard.getId());
+
+        return ResponseEntity.ok(response);
     }
 
     // Вход в профиль
@@ -62,12 +83,24 @@ public class UserController {
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginData) {
         String username = loginData.get("username");
         String password = loginData.get("password");
-
+    
         Optional<User> user = userService.authenticateUser(username, password);
         if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+            Long userId = user.get().getId();
+    
+            // Теперь передаём объект user, а не userId
+            Optional<Card> card = cardRepository.findByUser(user.get());
+    
+            Map<String, Object> response = new HashMap<>();
+            response.put("user_id", userId);
+            response.put("card_id", card.map(Card::getId).orElse(null)); // Если карточка есть, вернуть её ID
+    
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверные учетные данные.");
         }
     }
+    
+    
+    
 }

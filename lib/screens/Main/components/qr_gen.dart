@@ -3,7 +3,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class QRCodePage extends StatelessWidget {
   final int cardId; // ID визитки
-
+final String url ="http://10.202.0.136:9000/#/login";
   const QRCodePage({super.key, required this.cardId});
 
   @override
@@ -15,7 +15,7 @@ class QRCodePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             QrImageView(
-              data: cardId.toString(), // Зашиваем только ID в QR-код
+              data: url, // Зашиваем только ID в QR-код
               version: QrVersions.auto,
               size: 200.0,
               backgroundColor: Colors.white,

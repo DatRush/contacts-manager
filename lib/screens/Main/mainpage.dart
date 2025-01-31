@@ -2,47 +2,45 @@ import 'package:flut1/imports.dart';
 
 class MyHomePage extends StatelessWidget {
   final int? scannedCardId; // ID карточки, полученный через QR-код
-
   const MyHomePage({super.key, this.scannedCardId});
 
   @override
   Widget build(BuildContext context) {
     final apiService = context.read<ApiService>();
-    final currentUserId = context.read<AuthModel>().userId;
+    final currentUserId = 1;
 
-    return FutureBuilder(
-      future: apiService.fetchCards(),
+    // ✅ Проверяем, есть ли текущий пользователь
+    if (currentUserId == null) {
+      return const Center(child: Text('Ошибка: пользователь не найден'));
+    }
+
+    return FutureBuilder<CardData?>(
+      future: scannedCardId != null
+          ? apiService.fetchCardById(scannedCardId!) // Если есть QR-код
+          : apiService.fetchCardById(currentUserId), // Иначе текущий пользователь
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Ошибка: ${snapshot.error}'));
-        } else if (snapshot.hasData) {
-          final cardDataList = snapshot.data as List<CardData>;
-
-          if (cardDataList.isEmpty) {
-            return const Center(child: Text('Нет данных'));
-          }
-
-          // Если есть ID карточки из QR-кода, используем его
-          final cardData = scannedCardId != null
-              ? cardDataList.firstWhere(
-                  (card) => card.id == scannedCardId,
-                )
-              : cardDataList.firstWhere(
-                  (card) => card.id == currentUserId,
-                );
-
-          final isOwner = currentUserId == cardData.id;
-
-          return MyHomePageContent(cardData: cardData, isOwner: isOwner);
-        } else {
-          return const Center(child: Text('Нет данных'));
         }
+
+        final cardData = snapshot.data;
+
+        // ✅ Если карточка не найдена, создаем пустую
+        if (cardData == null) {
+          return const Center(child: Text('Карточка не найдена'));
+        }
+
+        final isOwner = currentUserId == cardData.id;
+
+        return MyHomePageContent(cardData: cardData, isOwner: isOwner);
       },
     );
   }
 }
+
+
 
 
 class MyHomePageContent extends StatelessWidget {

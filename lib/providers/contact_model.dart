@@ -23,7 +23,7 @@ class ContactModel with ChangeNotifier {
 
   // Метод для добавления контакта
   Future<void> addContact(int cardId, String type, String value, String info) async {
-    final contactData = {'type': type, 'value': value, 'info': info};
+    final contactData = {'name': type, 'url': value, 'description': info};
 
     // Отправляем данные на сервер и получаем добавленный контакт
     final savedContact = await apiService.addContact(cardId, contactData);
